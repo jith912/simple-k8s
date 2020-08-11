@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+spec: # specification for the deployment
+  replicas: 3 # number of instances of the template needed
+  selector: # the selectors and the labels in line 12 determine the pods the deployment is going to manage
+    matchLabels: # match the labels to identify the resources to manage
+      component: worker # label name and type to match
+  template:
+    metadata:
+      labels: 
+        component: worker # this is the label of the pod
+    spec:
+      containers:
+        - name: worker
+          image: stephengrider/multi-worker
+          env: 
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service
+            - name: REDIS_PORT
+              value: '6379'

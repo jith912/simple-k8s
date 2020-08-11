@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec: # specification for the deployment
+  replicas: 1 # number of instances of the template needed
+  selector: # the selectors and the labels in line 12 determine the pods the deployment is going to manage
+    matchLabels: # match the labels to identify the resources to manage
+      component: postgres # label name and type to match
+  template:
+    metadata:
+      labels: 
+        component: postgres # this is the label of the pod
+    spec:
+      volumes:
+        - name: postgres-storage # should be same as the name in line no 25
+          persistentVolumeClaim:
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports: #port exposed
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data #the location to be mapped to the volume
+              subPath: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD 
